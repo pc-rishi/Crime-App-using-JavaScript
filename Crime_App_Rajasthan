@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html dir ="ltr">
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <meta name="viewport" content="initial-scale=1,maximum-scale=1, user-scalable=no"/>
+   <title>Crime App for Rajasthan beta</title>
+   <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/themes/dark/main.css">
+   <link rel="stylesheet" href="https://js.arcgis.com/4.3/dijit/themes/claro/claro.css">
+  <script src="https://js.arcgis.com/4.3/"></script>
+ 
+   <style>
+      html,body, #mapDiv {
+  	       padding: 0;
+  	       margin: 0;
+  	       height:100%;
+  	       width:100%;
+        }
+
+        #layerToggle {
+          bottom: 20px;
+          right: 20px;
+          position: absolute;
+          z-index: 99;
+          background-color: grey;
+          border-radius: 8px;
+          padding: 10px;
+          opacity: 2.75;
+        }
+
+        #instruction {
+          z-index: 99;
+          position: absolute;
+          top: 15px;
+          left: 50%;
+          padding: 5px;
+          margin-left: -175px;
+          height: 20px;
+          width: 350px;
+          background: rgba(25,25,25,0.8);
+          color: white;
+        }
+    </style>
+
+  <script>
+   require([
+   	    "esri/Map",
+   	    "esri/views/MapView",
+        "esri/layers/GroupLayer",
+        "esri/layers/FeatureLayer",
+   	    "esri/widgets/ScaleBar",
+        "esri/widgets/Home",
+        "esri/widgets/Locate",
+        "esri/widgets/Search",
+        
+        "esri/widgets/LayerList",
+        "esri/widgets/Legend",
+        "dojo/dom",
+        "dojo/on",
+   	    "dojo/domReady!"
+
+   	], function(Map, MapView, GroupLayer, FeatureLayer, ScaleBar, Home, Locate, Search, LayerList, Legend, dom, on){
+
+          var boundary = new FeatureLayer({
+          url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/District_Boundary/FeatureServer",
+          id: "District Boundary",
+          visible: true,
+          visibilityMode: "independent"
+
+        });
+     
+      
+      var Rape = new FeatureLayer({
+          url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Rape/FeatureServer",
+          id: "Rape",
+          visible: false,
+          visibilityMode: "independent"
+         });
+         
+      var Murder = new FeatureLayer({
+          url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Murder/FeatureServer",
+          id: "Murder",
+          visible: false,
+          visibilityMode: "independent"
+         });
+
+      var Kidnapping = new FeatureLayer({
+        url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Kidnapping/FeatureServer",
+        id: "Kidnapping",
+        visible: false,
+        visibilityMode: "independent"
+      });
+
+      var Theft = new FeatureLayer({
+        url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Theft/FeatureServer",
+        id: "Theft",
+        visible: false,
+        visibilityMode: "independent"
+      });
+
+      var Robbery = new FeatureLayer({
+        url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Robbery/FeatureServer",
+        id: "Robbery",
+        visible: false,
+        visibilityMode: "independent"
+      });
+
+
+      var CrimeGroupLayer = new GroupLayer({
+        title: "Crime by type",
+        visibility: false,
+        visibilityMode: "exclusive",
+        layers: [boundary, Rape, Murder, Kidnapping, Theft, Robbery],
+        opacity: 0.75
+      });
+
+
+
+
+         var map = new Map({
+            basemap:"dark-gray",
+            layers: [CrimeGroupLayer]
+            
+         }); 
+
+         var view = new MapView({
+          container: "mapDiv",
+          map: map,
+          zoom: 7.5,
+          center: [75.8,26.9],
+        
+
+           popup:{
+          dockEnabled: true,
+          dockOptions: {
+            buttonEnabled: false,
+            breakpoint: false
+            }
+           }
+         });
+
+         var search = new Search({
+          view: view
+         });
+
+         view.ui.add(search, "top-right");
+
+          var layerList = new LayerList({
+            view: view
+            
+          });
+
+         
+      
+
+          view.ui.add(layerList, "top-right");
+         
+
+
+
+         var scaleBar = new ScaleBar({
+          view: view,
+          unit: "dual"
+         });
+
+         view.ui.add(scaleBar,{
+          position: "bottom-left"
+         });
+
+         var home = new Home({
+          view: view
+         });
+
+         view.ui.add(home,"top-left");
+
+         var locate = new Locate({
+          view: view
+         });
+
+         view.ui.add(locate,{
+          position: "top-left"
+         });
+
+         
+
+         
+
+        
+
+        var legend = new Legend({
+          view:view
+          
+
+        });
+
+        
+        view.ui.add(legend, "top-left");
+
+        var TotalCrimes = new FeatureLayer({
+          url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Total_crime_Final/FeatureServer",
+          id: "TotalCrimes",
+          visible: false
+         });
+
+        map.add(TotalCrimes);
+
+        var TemporalLayer = new FeatureLayer({
+          url:"http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Year_wise/FeatureServer",
+          id: "TemporalLayer",
+          visible: false,
+          popupTemplate: {
+            title: "<font color='#008000'>Temporal Info for {DISTRICT}",
+
+            content:[{
+          
+            type:"media",
+            mediaInfos: [{
+              title: "<b>Crimes for different years</b>",
+              type: "line-chart",
+              caption:"",
+              value:{
+                theme: "Electric",
+                fields:["Year_2001", "Year_2002", "Year_2003", "Year_2004", "Year_2005", "Year_2006","Year_2007", "Year_2008", "Year_2009", "Year_2010", "Year_2011", "Year_2012", "Year_2013", 
+                "Year_2014"],
+                normalizedField: null
+              }
+            }]
+          }]
+        },
+        outFields:["*"]
+         
+
+         });
+
+        map.add(TemporalLayer);
+      
+
+
+        var featureLayer = new FeatureLayer({
+          url:"http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/Rajasthan_crime_geocode/FeatureServer",
+          id: "featureLayer",
+          visible: false,
+          popupTemplate: {
+            title: "<font color='#008000'>Crime Info",
+
+            content:[{
+              type:"fields",
+              fieldInfos: [{
+              fieldName:"TOTAL_IPC_CRIMES",
+              visible: true,
+              label: "Total number of Crimes",
+              format:{
+                places: 0,
+                digitSeparator: true
+              }
+            },{
+              fieldName:"POPULATION",
+              visible: true,
+              label:"Population",
+              format:{
+                places: 0,
+                digitSeparator: true
+              }
+
+            }]
+          },{
+            type: "text",
+            text: "There are {TOTAL_IPC_CRIMES} incidents within {DISTRICT}"
+             
+          },
+          {
+            type:"media",
+            mediaInfos: [{
+              title: "<b>Crime by type</b>",
+              type: "pie-chart",
+              caption:"",
+              value:{
+                theme: "Electric",
+                fields:["THEFT", "CHEATING", "AUTO_THEFT", "BURGLARY", "RIOTS", "ATTEMPT_TO_MURDER","RAPE", "MURDER", "ROBBERY", "ARSON", "DOWRY_DEATHS", "DACOITY", "COUNTERFIETING"],
+                normalizedField: null
+              }
+            }]
+          }]
+        },
+        outFields:["*"]
+         
+
+         }); 
+         
+         map.add(featureLayer);
+
+
+
+         
+
+
+         var TotalCrimesLyrToggle = dom.byId("TotalCrimesLyr");
+         var TemporalLyrToggle = dom.byId("TemporalLyr");
+         var featureLyrToggle = dom.byId("featureLyr");
+         
+         on(featureLyrToggle, "change", function(){
+          featureLayer.visible=featureLyrToggle.checked;
+         })
+         on(TotalCrimesLyrToggle, "change", function(){
+          TotalCrimes.visible=TotalCrimesLyrToggle.checked;
+         });
+         on(TemporalLyrToggle, "change", function(){
+          TemporalLayer.visible=TemporalLyrToggle.checked;
+         });
+         
+
+
+
+         
+  
+        
+    });
+   </script>
+</head>
+
+<body>
+  
+	<div id ="mapDiv"></div>
+  <div id ="instruction">Click any point on the map to see its Information </div>
+  <span id ="layerToggle">
+    <input type="checkbox" id="TotalCrimesLyr"> Total Crime distribution
+    <input type="checkbox" id="TemporalLyr"> Temporal info
+    <input type="checkbox" id="featureLyr"> Crime info
+  
+</body>
+</html>

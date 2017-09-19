@@ -287,6 +287,13 @@
          }); 
          
          map.add(featureLayer);
+	 
+	 var tiles = new TileLayer({
+              url: "https://tiles.arcgis.com/tiles/np40b8S4HFSJo3OH/arcgis/rest/services/changed_Detection/MapServer",
+              id: "Change Detection"
+          });
+
+         map.add(tiles);
 
 
 

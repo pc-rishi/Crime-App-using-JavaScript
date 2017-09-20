@@ -47,6 +47,7 @@
    	    "esri/views/MapView",
         "esri/layers/GroupLayer",
         "esri/layers/FeatureLayer",
+        "esri/layers/TileLayer",
    	    "esri/widgets/ScaleBar",
         "esri/widgets/Home",
         "esri/widgets/Locate",
@@ -58,7 +59,7 @@
         "dojo/on",
    	    "dojo/domReady!"
 
-   	], function(Map, MapView, GroupLayer, FeatureLayer, ScaleBar, Home, Locate, Search, LayerList, Legend, dom, on){
+   	], function(Map, MapView, GroupLayer, FeatureLayer, TileLayer, ScaleBar, Home, Locate, Search, LayerList, Legend, dom, on){
 
           var boundary = new FeatureLayer({
           url: "http://services7.arcgis.com/np40b8S4HFSJo3OH/arcgis/rest/services/District_Boundary/FeatureServer",
@@ -288,9 +289,10 @@
          
          map.add(featureLayer);
 	 
-	 var tiles = new TileLayer({
+	       var tiles = new TileLayer({
               url: "https://tiles.arcgis.com/tiles/np40b8S4HFSJo3OH/arcgis/rest/services/changed_Detection/MapServer",
-              id: "Change Detection"
+              id: "Change Detection",
+              visible: false
           });
 
          map.add(tiles);

@@ -43,21 +43,20 @@
 
   <script>
    require([
-   	    "esri/Map",
-   	    "esri/views/MapView",
+   	"esri/Map",
+        "esri/views/MapView",
         "esri/layers/GroupLayer",
         "esri/layers/FeatureLayer",
         "esri/layers/TileLayer",
-   	    "esri/widgets/ScaleBar",
+	"esri/widgets/ScaleBar",
         "esri/widgets/Home",
         "esri/widgets/Locate",
         "esri/widgets/Search",
-        
         "esri/widgets/LayerList",
         "esri/widgets/Legend",
         "dojo/dom",
         "dojo/on",
-   	    "dojo/domReady!"
+       "dojo/domReady!"
 
    	], function(Map, MapView, GroupLayer, FeatureLayer, TileLayer, ScaleBar, Home, Locate, Search, LayerList, Legend, dom, on){
 
@@ -289,7 +288,7 @@
          
          map.add(featureLayer);
 	 
-	       var tiles = new TileLayer({
+	 var tiles = new TileLayer({
               url: "https://tiles.arcgis.com/tiles/np40b8S4HFSJo3OH/arcgis/rest/services/changed_Detection/MapServer",
               id: "Change Detection",
               visible: false
